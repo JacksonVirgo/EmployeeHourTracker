@@ -114,11 +114,20 @@ class App(tk.Tk):
     # Applys children to the window.
     def attach_children(self):
         current_row_index = 0
+        def show_report():
+            try:
+                count = int(amount_fetched.get())
+                self.show_weekly_report(count)
+            except:
+                self.show_weekly_report(5, error=True)
+
+        tk.Button(window, text= "How to Use", command=self.show_instructions_form).grid(row=current_row_index, column=0, columnspan=5)
+        current_row_index += 1
+        show_report_partial = partial(show_report)
+        tk.Button(window, text= "View X Employee Reports", command=show_report_partial).grid(row=current_row_index, column=0, columnspan=3)
         amount_fetched = tk.Entry(window)
         amount_fetched.grid(row=current_row_index, column=3, columnspan=2)
-        show_report = partial(self.show_weekly_report, amount_fetched.get())
 
-        tk.Button(window, text= "View X Employee Reports", command=show_report).grid(row=current_row_index, column=0, columnspan=3)
         current_row_index += 1
         tk.Button(window, text= "Add New Employee", command=self.show_new_employee_form).grid(row=current_row_index, columnspan=5)
         current_row_index += 1
@@ -138,32 +147,28 @@ class App(tk.Tk):
     ## Popup Windows
 
     # Shows the report when requested.
-    def show_weekly_report(self, fetch_size_raw):
+    def show_weekly_report(self, fetch_size, error = False):
         top= tk.Toplevel(self)
         top.geometry("500x500")
         top.title("Weekly Report")
         top.resizable(0,0)
-
-        fetch_size = 5
-        try:
-            fetch_size = int(fetch_size_raw)
-        except:
-            print("Error fetchign size, defaulting to 5")
 
         latest_hour_data = self.get_latest_hours(fetch_size)
         less_than = []
         more_than = []
         just_right = []
 
-        tk.Label(top, text="Employee Weekly Hours - %s most recent" % fetch_size).grid(row=0, column=0, columnspan=5)
+
         row_index = 0
+        tk.Label(top, text="Employee Weekly Hours - %s most recent" % fetch_size).grid(row=row_index, column=0, columnspan=5)
+        row_index += 1
 
-        tk.Label(top, text="Employee ID").grid(row=1, column=0)
-        tk.Label(top, text="Employee Name").grid(row=1, column=1)
-        tk.Label(top, text="Week").grid(row=1, column=2)
-        tk.Label(top, text="Total Hours").grid(row=1, column=3)
+        tk.Label(top, text="Employee ID").grid(row=row_index, column=0)
+        tk.Label(top, text="Employee Name").grid(row=row_index, column=1)
+        tk.Label(top, text="Week").grid(row=row_index, column=2)
+        tk.Label(top, text="Total Hours").grid(row=row_index, column=3)
 
-        row_index = 2
+        row_index += 1
         for timestamp in latest_hour_data:
             hours_data = latest_hour_data.get(timestamp)
             employee_id = hours_data["id"]
@@ -238,6 +243,33 @@ class App(tk.Tk):
                 self.reset_children()
         tk.Button(top,  text='Save New Employee', command=add_new_employee_event).grid(row=9, column=0, columnspan=5)
         tk.Button(top, text='Exit Without Saving', command=quit).grid(row=10, column=0, columnspan=5)
+
+    # Shows form dialogue for adding a new employee
+    def show_instructions_form(self):
+        top= tk.Toplevel(self)
+        top.geometry("500x500")
+        top.title("How to Use")
+        top.resizable(0,0)
+
+        row_index = 0
+        tk.Label(top, text="This page will explain to you how to use this software").pack()
+        row_index += 1
+
+        tk.Label(top, text="EDIT THIS or DUPLICATE").pack()
+        row_index += 1
+
+        tk.Label(top, text="EDIT THIS or DUPLICATE").pack()
+        row_index += 1
+
+        tk.Label(top, text="EDIT THIS or DUPLICATE").pack()
+        row_index += 1
+
+        def quit():
+            top.destroy()
+            top.update()
+
+        tk.Button(top, text='Go Back', command=quit).pack()
+
 
     # Shows form dialogue for adding hours for an employee
     def show_add_hours_form(self, employee_id):
