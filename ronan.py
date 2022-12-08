@@ -150,9 +150,6 @@ class App(tk.Tk):
         except:
             print("Error fetchign size, defaulting to 5")
 
-        print(fetch_size_raw)
-        print(fetch_size)
-
         latest_hour_data = self.get_latest_hours(fetch_size)
         less_than = []
         more_than = []
@@ -163,7 +160,8 @@ class App(tk.Tk):
 
         tk.Label(top, text="Employee ID").grid(row=1, column=0)
         tk.Label(top, text="Employee Name").grid(row=1, column=1)
-        tk.Label(top, text="Total Hours").grid(row=1, column=2)
+        tk.Label(top, text="Week").grid(row=1, column=2)
+        tk.Label(top, text="Total Hours").grid(row=1, column=3)
 
         row_index = 2
         for timestamp in latest_hour_data:
@@ -171,6 +169,7 @@ class App(tk.Tk):
             employee_id = hours_data["id"]
             employee = self.individual_employee_data.get(employee_id)
             employee_name = employee.get("name")
+            week = hours_data["WEEK"]
 
             employee_hours = 0
             days = ['MON', 'TUE', 'WED', 'THU', 'FRI']
@@ -194,7 +193,8 @@ class App(tk.Tk):
 
             tk.Label(top, text=employee_id).grid(row=row_index, column=0)
             tk.Label(top, text=employee_name).grid(row=row_index, column=1)
-            tk.Label(top, text=employee_hours).grid(row=row_index, column=2)
+            tk.Label(top, text=week).grid(row=row_index, column=2)
+            tk.Label(top, text=employee_hours).grid(row=row_index, column=3)
             row_index += 1
 
         tk.Label(top, text="AVERAGES").grid(row=row_index, column=1, columnspan=2)
